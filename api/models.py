@@ -17,3 +17,16 @@ class Comment(models.Model):
     text = models.TextField()
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.text
+
+class LikeComment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # The user who liked the comment
+    comment = models.ForeignKey(Comment, related_name='comment_likes', on_delete=models.CASCADE)  # The comment that was liked
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class LikePost(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # The user who liked the comment
+    post = models.ForeignKey(Comment, related_name='post_likes', on_delete=models.CASCADE)  # The comment that was liked
+    created_at = models.DateTimeField(auto_now_add=True)
