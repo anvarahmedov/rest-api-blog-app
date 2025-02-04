@@ -6,7 +6,7 @@ from rest_framework import routers
 from rest_framework.permissions import IsAuthenticated
 from tutorial.quickstart import views
 
-from api.models import User, Post, Comment, LikeComment
+from api.models import LikePost, User, Post, Comment, LikeComment
 
 from api import serializers
 from rest_framework import viewsets
@@ -78,7 +78,16 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = serializers.CommentSerializer
     filter_backends = [DjangoFilterBackend,]
-    filterset = ['text']
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_context(self):
+        """Pass request context to serializer."""
+        return {'request': self.request}
+
+class PostLikeViewSet(viewsets.ModelViewSet):
+    queryset = LikePost.objects.all()
+    serializer_class = serializers.LikePostSerializer
+    filter_backends = [DjangoFilterBackend,]
     permission_classes = [IsAuthenticated]
 
     def get_serializer_context(self):
@@ -89,7 +98,6 @@ class CommentLikeViewSet(viewsets.ModelViewSet):
     queryset = LikeComment.objects.all()
     serializer_class = serializers.LikeCommentSerializer
     filter_backends = [DjangoFilterBackend,]
-    filterset = ['text']
     permission_classes = [IsAuthenticated]
 
     def get_serializer_context(self):
@@ -101,6 +109,7 @@ router.register(r'users', UserViewSet)
 router.register(r'posts', PostViewSet)
 router.register(r'comments', CommentViewSet)
 router.register(r'comment-likes', CommentLikeViewSet)
+router.register(r'post-likes', PostLikeViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),

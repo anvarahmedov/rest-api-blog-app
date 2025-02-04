@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from api.models import Post, Comment, LikeComment
+from api.models import Post, Comment, LikeComment, LikePost
 from rest_framework.request import Request
 
 
@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 class PostSerializer(serializers.ModelSerializer):
     #comments = CommentSerializer(many=True, read_only=True)
     comments = serializers.SerializerMethodField()
+    post_likes = serializers.SerializerMethodField()
     class Meta:
         model = Post
         fields = '__all__'
@@ -19,11 +20,19 @@ class PostSerializer(serializers.ModelSerializer):
         from .serializers import CommentSerializer  # Import inside method
         return CommentSerializer(obj.comments.all(), many=True, context=self.context).data
 
+    def get_post_likes(self, obj):
+        return LikePostSerializer(obj.post_likes.all(), many=True, context=self.context).data
+
 
 class LikeCommentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = LikeComment
         fields = ['user', 'comment', 'created_at']
+
+class LikePostSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = LikePost
+        fields = ['user', 'post', 'created_at']
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     posts = serializers.SerializerMethodField()
